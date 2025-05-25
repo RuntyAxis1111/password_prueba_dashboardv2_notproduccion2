@@ -19,6 +19,15 @@ export function Header({ activeTab, onTabChange, onItemSelect, data }: HeaderPro
     { id: "truvatos", label: "TRUVATOS" },
   ]
 
+  const handleTabHover = (tabId: string) => {
+    setHoveredTab(tabId)
+  }
+
+  const handleTabLeave = () => {
+    // Small delay to allow moving to menu
+    setTimeout(() => setHoveredTab(null), 100)
+  }
+
   return (
     <header className="fixed top-0 left-0 w-full h-16 bg-white text-black z-50 shadow-md">
       <div className="flex flex-col items-center justify-center h-full">
@@ -31,14 +40,19 @@ export function Header({ activeTab, onTabChange, onItemSelect, data }: HeaderPro
             <div
               key={tab.id}
               className="flex-1 relative flex justify-center items-center"
-              onMouseEnter={() => setHoveredTab(tab.id)}
-              onMouseLeave={() => setHoveredTab(null)}
+              onMouseEnter={() => handleTabHover(tab.id)}
+              onMouseLeave={handleTabLeave}
             >
               <button
                 onClick={() => onTabChange(tab.id)}
                 className={`
-                  w-full h-full font-bold text-sm uppercase transition-all
-                  ${activeTab === tab.id ? "bg-black text-white" : "bg-transparent text-black hover:bg-black/10"}
+                  w-full h-full font-bold text-sm uppercase transition-all duration-300 ease-out
+                  transform hover:scale-105
+                  ${
+                    activeTab === tab.id
+                      ? "bg-black text-white shadow-lg"
+                      : "bg-transparent text-black hover:bg-black/10 hover:shadow-md"
+                  }
                   ${index < tabs.length - 1 ? "clip-path-arrow" : ""}
                 `}
                 style={{
@@ -48,10 +62,14 @@ export function Header({ activeTab, onTabChange, onItemSelect, data }: HeaderPro
                   zIndex: index + 1,
                 }}
               >
-                {tab.label}
+                <span className="inline-block transition-transform duration-200 hover:scale-110">{tab.label}</span>
               </button>
 
-              {hoveredTab === tab.id && <HoverMenu tabId={tab.id} data={data} onItemSelect={onItemSelect} />}
+              {hoveredTab === tab.id && (
+                <div onMouseEnter={() => setHoveredTab(tab.id)} onMouseLeave={() => setHoveredTab(null)}>
+                  <HoverMenu tabId={tab.id} data={data} onItemSelect={onItemSelect} />
+                </div>
+              )}
             </div>
           ))}
         </nav>
